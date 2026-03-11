@@ -1,0 +1,1 @@
+{"name": "test_click_constructor[chrome]", "status": "skipped", "parameters": [{"name": "driver", "value": "'chrome'"}], "start": 1773151450598, "stop": 1773151450598, "uuid": "da06192a-b9fd-4a30-9766-cc6fb0f5df53", "testCaseId": "0aa684a6a0a82267fdb2afaf3a8ae39d", "fullName": "tests.test_constructor#test_click_constructor", "titlePath": ["tests", "test_constructor.py"]}
