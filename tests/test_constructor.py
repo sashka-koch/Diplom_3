@@ -1,67 +1,56 @@
+import allure
 from pages.main_pages import MainPage
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 
-def test_click_constructor(driver):
-    page = MainPage(driver)
-
-    page.click_constructor()
-
-    assert "burger" in driver.current_url
+@allure.feature("Конструктор")
+class TestConstructor:
 
 
-def test_click_order_feed(driver):
-    page = MainPage(driver)
+    @allure.title("Переход по кнопке Конструктор")
+    def test_click_constructor(self, driver):
+        page = MainPage(driver)
 
-    page.click_order_feed()
+        page.click_constructor()
 
-    assert "feed" in driver.current_url
-
-
-def test_open_ingredient_popup(driver):
-    page = MainPage(driver)
-
-    page.click_ingredient()
-
-    WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located(page.ingredient_popup)
-    )
-
-    popup = driver.find_element(*page.ingredient_popup)
-
-    assert popup.is_displayed()
+        assert "burger" in page.get_current_url()
 
 
-def test_close_ingredient_popup(driver):
-    page = MainPage(driver)
+    @allure.title("Переход в ленту заказов")
+    def test_click_order_feed(self, driver):
+        page = MainPage(driver)
 
-    page.click_ingredient()
+        page.click_order_feed()
 
-    WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located(page.ingredient_popup)
-    )
-
-    page.close_popup()
-
-    WebDriverWait(driver, 10).until(
-        EC.invisibility_of_element_located(page.ingredient_popup)
-    )
-
-    assert True
+        assert "feed" in page.get_current_url()
 
 
-def test_ingredient_counter_increases(driver):
-    page = MainPage(driver)
+    @allure.title("Открытие попапа ингредиента")
+    def test_open_ingredient_popup(self, driver):
+        page = MainPage(driver)
 
-    initial_counter = page.get_counter_value()
+        page.click_ingredient()
 
-    page.add_ingredient_to_constructor()
+        assert page.is_popup_visible()
 
-    WebDriverWait(driver, 10).until(
-        lambda driver: page.get_counter_value() > initial_counter
-    )
 
-    new_counter = page.get_counter_value()
+    @allure.title("Закрытие попапа ингредиента")
+    def test_close_ingredient_popup(self, driver):
+        page = MainPage(driver)
 
-    assert new_counter > initial_counter
+        page.click_ingredient()
+        page.close_popup()
+
+        assert not page.is_popup_visible()
+
+
+    @allure.title("Увеличение счетчика ингредиента")
+    def test_ingredient_counter_increases(self, driver):
+        page = MainPage(driver)
+
+        initial = page.get_counter_value()
+
+        page.add_ingredient_to_constructor()
+
+        new_counter = page.get_counter_value()
+
+        assert new_counter > initial

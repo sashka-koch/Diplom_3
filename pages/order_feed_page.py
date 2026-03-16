@@ -1,62 +1,37 @@
+import allure
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from pages.base_page import BasePage
 
 
-class OrderFeedPage:
+class OrderFeedPage(BasePage):
 
     order_feed_button = (By.XPATH, "//a[contains(@href,'/feed')]")
-    create_order_button = (By.XPATH, "//button[contains(.,'Оформить заказ')]")
+    create_order_button = (By.XPATH, "//button[contains(text(),'Оформить заказ')]")
+    total_done = (By.XPATH, "//p[contains(text(),'Выполнено за всё время')]/following-sibling::p")
+    today_done = (By.XPATH, "//p[contains(text(),'Выполнено за сегодня')]/following-sibling::p")
+    order_number = (By.CSS_SELECTOR, ".Modal_modal__title")
+    in_progress_orders = (By.CSS_SELECTOR, ".OrderFeed_orderListReady li")
 
-    total_done = (By.XPATH, "//p[text()='Выполнено за всё время:']/following-sibling::p")
-    today_done = (By.XPATH, "//p[text()='Выполнено за сегодня:']/following-sibling::p")
-
-    order_number = (By.XPATH, "//h2[contains(@class,'Modal_modal__title')]")
-
-    in_progress_orders = (By.XPATH, "//ul[contains(@class,'OrderFeed_orderListReady')]//li")
-
-    def __init__(self, driver):
-        self.driver = driver
-
+    @allure.step("Открыть ленту заказов")
     def open_order_feed(self):
-        WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(self.order_feed_button)
-        ).click()
+        self.click(self.order_feed_button)
 
+    @allure.step("Создать заказ")
     def create_order(self):
+        self.click(self.create_order_button)
+        return self.get_text(self.order_number)
 
-        WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(self.create_order_button)
-        ).click()
-
-        order_number = WebDriverWait(self.driver, 15).until(
-            EC.visibility_of_element_located(self.order_number)
-        ).text
-
-        return order_number
-
+    @allure.step("Получить количество выполненных заказов")
     def get_total_done(self):
+        return int(self.get_text(self.total_done))
 
-        total = WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located(self.total_done)
-        ).text
-
-        return int(total)
-
+    @allure.step("Получить количество заказов за сегодня")
     def get_today_done(self):
-
-        today = WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located(self.today_done)
-        ).text
-
-        return int(today)
+        return int(self.get_text(self.today_done))
 
     def order_is_in_progress(self, number):
-
         orders = self.driver.find_elements(*self.in_progress_orders)
-
         for order in orders:
             if number in order.text:
                 return True
-
         return False
